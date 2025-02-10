@@ -9,23 +9,31 @@ import Profile from './Pages/Profile';
 import ProtectedRoute from './auth/ProtectedRoutes';
 import ForgotPass from './Pages/ForgotPass';
 import AddUser from './Pages/AddUser';
+// import CertificateForm from './Pages/CertificateForm';
+import { Quiz } from './Pages/Quiz';
+import { Failed } from './Pages/Faild';
+import { Certificate } from './Pages/Certificate';
 
 const App = () => {
   return (
     <>
       <BrowserRouter>
         <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path='/signin' element={<Login />} />
-          <Route path='/pass' element={<ForgotPass />} />
-          <Route path='/signup' element={<Register />} />
-          <Route path='/users' element={<ProtectedRoute Component={User}/>} />
-          <Route path='/profile' element={<ProtectedRoute Component={Profile} />} />
-          <Route path='/adduser' element={<ProtectedRoute Component={AddUser} />} />
-          <Route path='/updateuser/:id' element={<ProtectedRoute Component={AddUser} />} />
-        </Route>
-          
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path='/signin' element={<Login />} />
+            <Route path='/pass' element={<ForgotPass />} />
+            <Route path='/signup' element={<Register />} />
+            <Route path='/users' element={<ProtectedRoute Component={User} />} />
+            <Route path='/profile' element={<ProtectedRoute Component={Profile} />} />
+            <Route path='/adduser' element={<ProtectedRoute Component={AddUser} />} />
+            <Route path='/updateuser/:id' element={<ProtectedRoute Component={AddUser} />} />
+            <Route path='/get-certificate' element={<ProtectedRoute Component={Certificate} />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/certificate" element={<Certificate />} />
+            <Route path="/failed" element={<Failed />} />
+          </Route>
+
         </Routes>
       </BrowserRouter>
     </>

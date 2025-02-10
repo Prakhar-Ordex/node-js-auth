@@ -2,8 +2,9 @@ const express = require('express')
 const connectDB = require('./src/db/db');
 const crudeRouter = require('./src/routes/crud.routes');
 const authRouter = require("./src/routes/auth.routes");
+const questionRouter = require("./src/routes/questions.routes");
 const cors = require('cors');
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
 const app = express()
 const port = 3000
 
@@ -18,7 +19,8 @@ app.use(cors({
 }))   
 
 app.use('/apis', crudeRouter);
-app.use('/auth',authRouter)
+app.use('/auth',authRouter);
+app.use('/apis',questionRouter)
 
 
 app.get('/', (req, res) => {

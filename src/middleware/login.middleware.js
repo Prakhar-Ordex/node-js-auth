@@ -45,6 +45,12 @@ const authenticate = async (req, res, next) => {
                     sameSite: "Strict",
                     maxAge: 10 * 1000, // 10 seconds
                 });
+                res.cookie("refresh_token", refreshToken, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "Strict",
+                    maxAge:  24 * 60 * 60 * 1000, // Example: 1 days
+                });
                 return next();
             } catch (error) {
                 return res.status(410).json({ message: "Invalid refresh token" });
