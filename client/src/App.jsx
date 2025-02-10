@@ -28,7 +28,7 @@ const App = () => {
             <Route path='/profile' element={<ProtectedRoute Component={Profile} />} />
             <Route path='/adduser' element={<ProtectedRoute Component={AddUser} />} />
             <Route path='/updateuser/:id' element={<ProtectedRoute Component={AddUser} />} />
-            <Route path='/get-certificate' element={<ProtectedRoute Component={Certificate} />} />
+            <Route path='/get-certificate' element={<Certificate />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/certificate" element={<Certificate />} />
             <Route path="/failed" element={<Failed />} />
