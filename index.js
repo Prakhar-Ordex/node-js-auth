@@ -3,6 +3,7 @@ const connectDB = require('./src/db/db');
 const crudeRouter = require('./src/routes/crud.routes');
 const authRouter = require("./src/routes/auth.routes");
 const questionRouter = require("./src/routes/questions.routes");
+const certificateRouter = require("./src/routes/certificate.routes");
 const cors = require('cors');
 var cookieParser = require('cookie-parser');
 const app = express()
@@ -21,6 +22,7 @@ app.use(cors({
 app.use('/apis', crudeRouter);
 app.use('/auth',authRouter);
 app.use('/apis',questionRouter)
+app.use('/apis',certificateRouter)
 
 
 app.get('/', (req, res) => {

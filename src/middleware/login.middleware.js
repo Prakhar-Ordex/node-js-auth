@@ -8,10 +8,13 @@ const authenticate = async (req, res, next) => {
         const accessToken = req.cookies?.access_token;
         const refreshToken = req.cookies?.refresh_token;
 
+
         if (accessToken) {
             try {
                 jwt.verify(accessToken, "privateKey");
-
+                const decodedAccess = jwt.verify(accessToken, "privateKey");
+                const user = await User.findOne({ where: { id: decodedAccess.id } });
+                req.id = await user.dataValues.id;
                 return next();
             } catch (error) {
                 if (error.name !== "TokenExpiredError") {
@@ -24,6 +27,7 @@ const authenticate = async (req, res, next) => {
                 const decodedRefresh = jwt.verify(refreshToken, "privateKey");
 
                 const user = await User.findOne({ where: { id: decodedRefresh.id } });
+                console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>fd",user)
                 if (!user || user.refresh_token !== refreshToken) {
                     return res.status(410).json({ message: "Invalid refresh token" });
                 }
@@ -51,6 +55,8 @@ const authenticate = async (req, res, next) => {
                     sameSite: "Strict",
                     maxAge:  24 * 60 * 60 * 1000, // Example: 1 days
                 });
+                req.id = await user.dataValues.id;
+                console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",user.dataValues)
                 return next();
             } catch (error) {
                 return res.status(410).json({ message: "Invalid refresh token" });
@@ -59,7 +65,6 @@ const authenticate = async (req, res, next) => {
 
         return res.status(410).json({ message: "Unauthorized. Tokens are missing or invalid." })
     } catch (error) {
-
         return res.status(410).json({ message: "An error occurred during token verification", error });
     }
 };

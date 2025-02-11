@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import Input from '../components/common/Input'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -43,6 +44,15 @@ const Login = () => {
 
         if (loginUser.status === 210) {
           toast.warning(data?.message || "Aleredy login");
+        }
+
+         // Check if there's a pending quiz result
+         const pendingResult = sessionStorage.getItem('pendingQuizResult');
+         const certificate = searchParams.get('redirect');
+
+        if (pendingResult && certificate === 'certificate') {
+          navigate('/result?redirect=certificate');
+          return;
         }
 
         navigate('/profile');

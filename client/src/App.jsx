@@ -11,8 +11,8 @@ import ForgotPass from './Pages/ForgotPass';
 import AddUser from './Pages/AddUser';
 // import CertificateForm from './Pages/CertificateForm';
 import { Quiz } from './Pages/Quiz';
-import { Failed } from './Pages/Faild';
 import { Certificate } from './Pages/Certificate';
+import { Result } from './Pages/Result';
 
 const App = () => {
   return (
@@ -28,10 +28,10 @@ const App = () => {
             <Route path='/profile' element={<ProtectedRoute Component={Profile} />} />
             <Route path='/adduser' element={<ProtectedRoute Component={AddUser} />} />
             <Route path='/updateuser/:id' element={<ProtectedRoute Component={AddUser} />} />
-            <Route path='/get-certificate' element={<Certificate />} />
             <Route path="/quiz" element={<Quiz />} />
-            <Route path="/certificate" element={<Certificate />} />
-            <Route path="/failed" element={<Failed />} />
+            <Route path="/certificate/:id" element={<Certificate />} />
+            <Route path="/result" element={<Result />} />
+            <Route path='*' element={<h1>Not Found </h1>}/>
           </Route>
 
         </Routes>

@@ -1,20 +1,58 @@
+const Result = require("../models/answer.model");
+const User = require("../models/auth.model");
 const Certificate = require("../models/certificate.model");
 
-const genrateCertificate = async(req,res)=>{
-    try{
-    const { userId, quizId} = req.body;
-    
+const genrateCertificate = async (req, res) => {
+  try {
+    const { userId, quizId } = req.body;
+
     const certificate = await Certificate.create({
       userId,
       quizId,
       score
     });
-    
-    res.json({
+
+    res.status(201).json({
       shareLink: `https://yourapp.com/certificate/${certificate.uniqueShareId}`,
-      certificateId: certificate.id
+      certificateData: certificate
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
+
+const findCertificatesByID = async (req, res) => {
+  try {
+    const certificate = await Certificate.findByPk(req.params.id);
+    if (!certificate) {
+      return res.status(404).json({ message: 'Certificate not found' });
+    }
+    const user = await User.findOne({ where: { id: certificate.dataValues.userId } });
+
+    const result = await Result.findOne({where:{id:certificate.dataValues.quizId}})
+
+    const certificateData = certificate.dataValues;
+    const userData = user.dataValues;
+    const resultData = result.dataValues;
+
+    console.log("user data >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",userData)
+    console.log("certi data >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",certificateData)
+    console.log("result data >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",resultData)
+
+    res.status(200).json({
+      certificate:certificateData.id,
+      name:userData.username,
+      quizName:resultData.quizName,
+      createdDate:certificateData.createdAt
+    });
+
+    // res.status(201), json(certificate);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports = {
+  genrateCertificate,
+  findCertificatesByID
+};

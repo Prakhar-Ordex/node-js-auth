@@ -9,14 +9,22 @@ const Result = sequelize.define('Result', {
   },
   userId: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true  
   },
   score: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  passed: {
+  totalQuestions: {  
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  passingStatus: {  
     type: DataTypes.BOOLEAN,
+    allowNull: false
+  },
+  quizName: {  
+    type: DataTypes.STRING,
     allowNull: false
   },
   completedAt: {

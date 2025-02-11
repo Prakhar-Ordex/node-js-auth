@@ -195,17 +195,20 @@ const CertificateCanvas = ({
   }, [width, height, recipientName, certificationName, earnedDate, certificateId, signerName, signerTitle, companyLogo]);
 
   return (
-    <div className="flex flex-col items-center gap-4 ">
+    <div className=" items-center gap-4 ">
       <canvas 
         ref={canvasRef}
         className="shadow-lg"
       />
-      <button
+      <div>
+    
+      </div>
+      {/* <button
         onClick={downloadCertificate}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
       >
         Download Certificate
-      </button>
+      </button> */}
     </div>
   );
 };

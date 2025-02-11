@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 // Quiz Component
-export const Quiz = () => {
+export const Quiz = ({quizName="Node JS"}) => {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [score, setScore] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  // const [isCompleted, setIsCompleted] = useState(false);
+  // const [score, setScore] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,35 +43,35 @@ export const Quiz = () => {
     }
   };
 
-  const calculateScore = async () => {
+  const genrateCertificate = async () => {
     try {
-      const response = await fetch('http://localhost:3000/apis/submit', {
+      const certResponse = await fetch('http://localhost:3000/apis/certificates', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'user123', // Replace with actual user ID
-          answers
+          userId: 'user123',
+          score: result.score,
+          totalQuestions: questions.length
         }),
       });
-      const result = await response.json();
-      setScore(result.score);
-      setIsCompleted(true);
-      if (result.passed) {
-        navigate('/certificate');
-      } else {
-        navigate(`/failed?score=${result.score}`);
-      }
+      const certData = await certResponse.json();
+      console.log(certData);
+      navigate(`/certificate/${certData.id}`);
     } catch (error) {
-      console.error('Error submitting results:', error);
+      console.log(error);
     }
+  }
+
+  const calculateScore = async () => {
+    const data = {answers,quizName}
+    sessionStorage.setItem('pendingQuizResult', JSON.stringify(data));
+    navigate('/result?redirect=testStatus')
   };
 
   if (!questions.length) return <div>Loading...</div>;
 
   return (
-     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
@@ -81,7 +83,7 @@ export const Quiz = () => {
             </span>
           </div>
           <div className="h-2 bg-gray-200 rounded">
-            <div 
+            <div
               className="h-full bg-blue-500 rounded"
               style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
             ></div>
@@ -95,12 +97,11 @@ export const Quiz = () => {
               <button
                 key={index}
                 onClick={() => handleAnswer(index)}
-                className={`w-full p-4 text-left rounded-lg border ${
-                  answers[questions[currentQuestion].id] === index
-                    ? 'bg-blue-50 border-blue-500'
-                    : 'border-gray-200 hover:bg-gray-50'
-                }`}
-              > 
+                className={`w-full p-4 text-left rounded-lg border ${answers[questions[currentQuestion].id] === index
+                  ? 'bg-blue-50 border-blue-500'
+                  : 'border-gray-200 hover:bg-gray-50'
+                  }`}
+              >
                 {option}
               </button>
             ))}
@@ -111,13 +112,14 @@ export const Quiz = () => {
           <button
             onClick={handleNext}
             disabled={answers[questions[currentQuestion].id] === undefined}
-            className={`px-6 py-2 rounded-lg ${
-              answers[questions[currentQuestion].id] === undefined
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
+            className={`px-6 py-2 rounded-lg ${answers[questions[currentQuestion].id] === undefined
+              ? 'bg-gray-300 cursor-not-allowed'
+              : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
           >
-            {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
+            {
+              isLoading ? 'Submitting...' : currentQuestion === questions.length - 1 ? 'Finish' : 'Next'
+            }
           </button>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
-    const[data,setData] = useState({})
+    const[data,setData] = useState({});
+    const navigate = useNavigate();
   
     const fetchData = async () => {
         try {
