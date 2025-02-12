@@ -11,6 +11,7 @@ const Register = () => {
     password:"",
     username:""
   })
+  const[isLoading,setIsLoading] = useState(false);
    // Check if there's a pending quiz result
    const pendingResult = sessionStorage.getItem('pendingQuizResult');
    const certificate = searchParams.get('redirect');
@@ -29,6 +30,7 @@ const Register = () => {
     }
 
     try {
+      setIsLoading(true);
       const User = await fetch('http://localhost:3000/auth/signUp',{
         method: 'POST',
         headers: {
@@ -53,6 +55,8 @@ const Register = () => {
       console.log(data);
     } catch (error) {
       toast.error("Failed to sign up  . Please check your credentials"); 
+    }finally{
+      setIsLoading(false);
     }
   }
   return (
@@ -69,7 +73,7 @@ const Register = () => {
                 <Input name={"Your Email"} placeholder={"your@gmail.com"} id={"email"} type={"email"} onChange={handleChange} value={formData.email}/>
                 <Input name="Password"  placeholder={"••••••••"} id={"password"} type={"password"} onChange={handleChange} value={formData.password}/>
 
-                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 bg-blue-400">Sign in</button>
+                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 bg-blue-400">{isLoading ? "Loading...":"Sign in"}</button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Do you have an account yet? <Link to="/signin" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign in</Link>
                 </p>

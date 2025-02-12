@@ -10,6 +10,7 @@ const Login = () => {
     email: "",
     password: ""
   })
+  const [isLoading,setIsLoading] = useState(false);
    // Check if there's a pending quiz result
    const pendingResult = sessionStorage.getItem('pendingQuizResult');
    const certificate = searchParams.get('redirect');
@@ -27,6 +28,7 @@ const Login = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const loginUser = await fetch('http://localhost:3000/auth/signIn', {
         method: 'POST',
         headers: {
@@ -62,6 +64,8 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       toast.error("Failed to log in. Please check your credentials");
+    }finally{
+      setIsLoading(false);
     }
 
   }
@@ -78,7 +82,7 @@ const Login = () => {
                 <Input name={"Your Email"} placeholder={"your@gmail.com"} id={"email"} type={"email"} onChange={handleChange} value={formData.email}/>
                 <Input name="Password" placeholder={"••••••••"} id={"password"} type={"password"} onChange={handleChange} value={formData?.password} />
 
-                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 bg-blue-400">Sign in</button>
+                <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 bg-blue-400">{isLoading ? "Loading..." :  "Sign in"}</button>
                 <Link to="/pass" className="text-sm font-medium text-primary-600 hover:underline text-blue-500">Forgot password?</Link>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet? <Link to={pendingResult && certificate === 'certificate' ? "/signup?redirect=certificate" : "/signup"} className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</Link>

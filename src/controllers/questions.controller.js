@@ -74,13 +74,31 @@ const submitQuestions = async (req, res) => {
 
     if (resultData.passingStatus) {
       try {
-        const certificate = await Certificate.create({
-          userId: resultData.userId,
-          quizId: resultData.id,
-          score: resultData.score,
+        // Check if user already has a passing certificate for this quiz
+        const existingCertificate = await Certificate.findOne({
+          where: {
+            userId: resultData.userId,
+            quizName: title,
+          }
         });
 
-        const certificateData = certificate.dataValues;
+        let certificateData;
+        
+        if (existingCertificate) {
+          // Update existing certificate with new score
+          existingCertificate.score = resultData.score;
+          await existingCertificate.save();
+          certificateData = existingCertificate.dataValues;
+        } else {
+          // Create new certificate only if one doesn't exist
+          const certificate = await Certificate.create({
+            userId: resultData.userId,
+            quizId: resultData.id,
+            score: resultData.score,
+            quizName: title,
+          });
+          certificateData = certificate.dataValues;
+        }
 
         return res.status(200).json({
           passingStatus: resultData.passingStatus,
@@ -88,7 +106,6 @@ const submitQuestions = async (req, res) => {
           certificateID: certificateData.id,
           totalQuestions: resultData.totalQuestions
         });
-        // console.log("certificate>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", certificate.dataValues);
       } catch (error) {
         res.status(500).json({ error: error.message });
       }

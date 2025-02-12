@@ -19,6 +19,13 @@ export const Result = () => {
   const getResult = async () => {
     const resultData = JSON.parse(sessionStorage.getItem('pendingQuizResult'));
     console.log(resultData);
+    
+    if (!resultData) {
+      toast.error("No quiz result found");
+      navigate('/skill-tests');
+      return;
+    }
+
     try {
       setIsLoading(true);
       const response = await fetch('http://localhost:3000/apis/submit', {
@@ -27,34 +34,33 @@ export const Result = () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({ ...resultData }),
+        body: JSON.stringify(resultData),
       });
+
       const result = await response.json();
-      console.log(result);
-      if(response.ok){
-        setPass(result.passingStatus);
-        setScore(result.score);
-        setQuestions(result.totalQuestions);
-        setPassingScore(result.passingScore);
-        if(result.passingStatus){
-          setCertificateID(result.certificateID)
+
+      if (!response.ok) {
+        if (response.status === 410) {
+          toast.warn("Please SignIn or SignUp to generate your certificate");
+          navigate('/signin?redirect=certificate');
+          return;
         }
+        throw new Error(result.message || 'Failed to submit quiz results');
       }
 
-      if (response.status === 410) {
-        toast.warn("Plese SignIn Or SignUp to genrate your CERTIFICATE")
-        navigate('/signin?redirect=certificate');
-        return;
+      setPass(result.passingStatus);
+      setScore(result.score);
+      setQuestions(result.totalQuestions);
+      setPassingScore(result.passingScore);
+      
+      if (result.passingStatus) {
+        setCertificateID(result.certificateID);
       }
 
-
-      // if (result.passed) {
-      //   genrateCertificate();
-      // } else {
-      //   navigate(`/failed?score=${result.score}`);
-      // }
     } catch (error) {
       console.error('Error submitting results:', error);
+      toast.error(error.message || 'Failed to process quiz results');
+      navigate('/skill-tests');
     } finally {
       setIsLoading(false);
     }
