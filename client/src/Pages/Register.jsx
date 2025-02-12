@@ -1,15 +1,19 @@
 import React, { useState } from 'react'
 import Input from '../components/common/Input'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData,setFormData] = useState({
     email:"",
     password:"",
     username:""
   })
+   // Check if there's a pending quiz result
+   const pendingResult = sessionStorage.getItem('pendingQuizResult');
+   const certificate = searchParams.get('redirect');
 
   const handleChange = (e) => {
     const {name,value} = e.target;
@@ -35,8 +39,14 @@ const Register = () => {
       })
       const data = await User.json();
       if(User.status === 201){
-       navigate('/signin')
-       toast.success(data?.message)
+        if (pendingResult && certificate === 'certificate') {
+          navigate('/signin?redirect=certificate')
+         
+        }else{
+          navigate('/signin')
+  
+        }
+        toast.success(data?.message)
       }else{
         toast.error(data.error)
       }

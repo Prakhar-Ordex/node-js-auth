@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const Result = () => {
   const navigate = useNavigate  ();
   const query = new URLSearchParams(useLocation().search);
+  const {path} = useParams();
   const redirect = query.get("redirect");
   const [isPass, setPass] = useState(null);
   const [score, setScore] = useState(null);
@@ -60,8 +61,10 @@ export const Result = () => {
   }
 
   useEffect(() => {
-    if (score || redirect === "certificate" || redirect === "testStatus") {
+    if (score || redirect === "certificate" || redirect === "testStatus" || path === "quiz" || path === "login") {
       getResult();
+    }else{
+      navigate("/*")
     }
   }, [])
 
@@ -89,7 +92,7 @@ export const Result = () => {
             </p>
             <div className="space-x-4">
               <a
-                href="/quiz"
+                href="/skill-tests"
                 className="inline-block bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
               >
                 Try Again

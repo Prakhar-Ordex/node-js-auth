@@ -13,6 +13,8 @@ import AddUser from './Pages/AddUser';
 import { Quiz } from './Pages/Quiz';
 import { Certificate } from './Pages/Certificate';
 import { Result } from './Pages/Result';
+import CertificationCards from './Pages/CertificationCards';
+import NotFoundPage from './Pages/NotFoundPage';
 
 const App = () => {
   return (
@@ -28,10 +30,12 @@ const App = () => {
             <Route path='/profile' element={<ProtectedRoute Component={Profile} />} />
             <Route path='/adduser' element={<ProtectedRoute Component={AddUser} />} />
             <Route path='/updateuser/:id' element={<ProtectedRoute Component={AddUser} />} />
-            <Route path="/quiz" element={<Quiz />} />
+            {/* <Route path="/quiz" element={<Quiz />} /> */}
             <Route path="/certificate/:id" element={<Certificate />} />
-            <Route path="/result" element={<Result />} />
-            <Route path='*' element={<h1>Not Found </h1>}/>
+            <Route path="/result/:path" element={<Result />} />
+            <Route path="/skill-tests" element={<CertificationCards />} />
+            <Route path="/quiz/:test" element={<Quiz />} />
+            <Route path='*' element={<NotFoundPage/>}/>
           </Route>
 
         </Routes>

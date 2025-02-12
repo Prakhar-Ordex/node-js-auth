@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
+import { jsPDF } from 'jspdf';
 
-const CertificateCanvas = ({
+const CertificateCanvas = forwardRef(({
   recipientName = "Prakhar Tripathi",
   certificationName = "JavaScript (Basic)",
   earnedDate = "20 Jan, 2025",
@@ -11,7 +12,7 @@ const CertificateCanvas = ({
   height = 700,
   companyLogo = null ,// New prop for company logo
   signatureImage = null 
-}) => {
+}, ref) => {
   const canvasRef = useRef(null);
   const logoRef = useRef(null);
   const signatureRef = useRef(null);
@@ -166,12 +167,32 @@ const CertificateCanvas = ({
     ctx.fillText(signerTitle, width - 100, 630);
   };
 
-  const downloadCertificate = () => {
+  const downloadCertificate = async (format = 'png') => {
     const canvas = canvasRef.current;
-    const link = document.createElement('a');
-    link.download = 'certificate.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    
+    if (format === 'png') {
+      // Download as PNG
+      const link = document.createElement('a');
+      link.download = `certificate.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } else if (format === 'pdf') {
+      try {
+        // Create PDF with proper dimensions
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: [width, height]
+        });
+        
+        // Add the canvas image to PDF
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+        pdf.save('certificate.pdf');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -194,6 +215,15 @@ const CertificateCanvas = ({
     initCanvas();
   }, [width, height, recipientName, certificationName, earnedDate, certificateId, signerName, signerTitle, companyLogo]);
 
+  // Expose the download function via ref
+  useEffect(() => {
+    if (ref) {
+      ref.current = {
+        downloadCertificate
+      };
+    }
+  }, [ref]);
+
   return (
     <div className=" items-center gap-4 ">
       <canvas 
@@ -211,6 +241,6 @@ const CertificateCanvas = ({
       </button> */}
     </div>
   );
-};
+});
 
 export default CertificateCanvas;

@@ -7,9 +7,13 @@ const Question = sequelize.define('Question', {
     autoIncrement: true,
     primaryKey: true
   },
-  question: {
+  title: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  question: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   options: {
     type: DataTypes.TEXT, // Change JSON to TEXT
@@ -23,6 +27,10 @@ const Question = sequelize.define('Question', {
   },
   correctAnswer: {
     type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  type: {
+    type: DataTypes.STRING,
     allowNull: false
   }
 }, {

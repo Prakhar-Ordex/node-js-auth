@@ -1,4 +1,4 @@
-const Result = require("../models/answer.model");
+const Result = require("../models/result.model");
 const User = require("../models/auth.model");
 const Certificate = require("../models/certificate.model");
 

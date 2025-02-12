@@ -1,28 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import CryptoJS from 'crypto-js';
+import { decryptQueryParams } from '../utils/dataEncrypt';
 
 // Quiz Component
-export const Quiz = ({quizName="Node JS"}) => {
+export const Quiz = () => {
+  const [searchParams] = useSearchParams();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  // const [isCompleted, setIsCompleted] = useState(false);
-  // const [score, setScore] = useState(0);
+  const [urlData, setUrlData] = useState(null)
+  
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchQuestions();
+    const encryptedParams = searchParams.get('data');
+    if (encryptedParams) {
+      const decryptedData = decryptQueryParams(encryptedParams);
+      setUrlData(decryptedData)
+      if (decryptedData) {
+        fetchQuestions(decryptedData);
+      } else {
+        toast.error('Link has expired or is invalid');
+        navigate('/');
+      }
+    } else {
+      navigate('*');
+    }
   }, []);
 
-  const fetchQuestions = async () => {
+   
+
+  const fetchQuestions = async (decryptedData) => {
     try {
-      const response = await fetch('http://localhost:3000/apis/questions');
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:3000/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`);
       const data = await response.json();
       setQuestions(data);
     } catch (error) {
       console.error('Error fetching questions:', error);
+      toast.error('Failed to load questions');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,29 +65,10 @@ export const Quiz = ({quizName="Node JS"}) => {
     }
   };
 
-  const genrateCertificate = async () => {
-    try {
-      const certResponse = await fetch('http://localhost:3000/apis/certificates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: 'user123',
-          score: result.score,
-          totalQuestions: questions.length
-        }),
-      });
-      const certData = await certResponse.json();
-      console.log(certData);
-      navigate(`/certificate/${certData.id}`);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   const calculateScore = async () => {
-    const data = {answers,quizName}
+    const data = {answers,title:urlData.title,type:urlData.type}
     sessionStorage.setItem('pendingQuizResult', JSON.stringify(data));
-    navigate('/result?redirect=testStatus')
+    navigate('/result/quiz?redirect=testStatus')
   };
 
   if (!questions.length) return <div>Loading...</div>;

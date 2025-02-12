@@ -1,27 +1,51 @@
-const Result = require("../models/answer.model");
+const Result = require("../models/result.model");
 const Certificate = require("../models/certificate.model");
 const Question = require("../models/question.model");
 
 const questions = async (req, res) => {
   try {
-    const questions = await Question.findAll({
-      attributes: ['id', 'question', 'options'] // Exclude correct answers
-    });
-    res.json(questions);
+    const { type, title } = req.query;
+    console.log("type and title > ", type, title);
+
+    if (type && title) {
+      const questions = await Question.findAll({
+        attributes: ['id', 'question', 'options'],
+        where: { type, title },
+      });
+      res.status(200).json(questions);
+    } else {
+      const questions = await Question.findAll({
+        attributes: ['id', 'question', 'options'],
+      });
+      res.status(200).json(questions);
+    }
+
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+}
+
+const getAllquiz = async (req, res) => {
+  try {
+    const quiz = await Question.findAll({
+      attributes: ['type', 'title'],
+      group: ['type', 'title'], // Group by both type and title to get unique combinations
+    });
+    return res.status(201).json(quiz);
+  } catch (error) {
+    console.log(error)
   }
 }
 
 const submitQuestions = async (req, res) => {
   // console.log("req>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",req.body,req.id)
   try {
-    const { quizName, answers } = req.body;
+    const { title, answers,type } = req.body;
     const id = req.id;
     const refreshToken = req.cookies?.refresh_token;
     console.log("refresh>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", refreshToken)
 
-    const questions = await Question.findAll({ attributes: ['id', 'correctAnswer'] });
+    const questions = await Question.findAll({ attributes: ['id', 'correctAnswer'], where: { type, title }, });
     // console.log("first>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",questions)
     let score = 0;
 
@@ -38,7 +62,7 @@ const submitQuestions = async (req, res) => {
       userId: id,
       score: score,
       passingStatus: passed,
-      quizName: quizName,
+      quizName: title,
       totalQuestions: questions.length
     });
 
@@ -72,9 +96,9 @@ const submitQuestions = async (req, res) => {
       return res.status(200).json(
         {
           passingStatus: resultData.passingStatus,
-          score: resultData.score, 
+          score: resultData.score,
           totalQuestions: resultData.totalQuestions,
-          passingScore:passingScore
+          passingScore: passingScore
         });
     }
 
@@ -85,5 +109,6 @@ const submitQuestions = async (req, res) => {
 
 module.exports = {
   questions,
-  submitQuestions
+  submitQuestions,
+  getAllquiz
 }
