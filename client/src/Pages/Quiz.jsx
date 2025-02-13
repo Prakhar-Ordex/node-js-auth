@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import CryptoJS from 'crypto-js';
 import { decryptQueryParams } from '../utils/dataEncrypt';
 
-// Quiz Component
 export const Quiz = () => {
   const [searchParams] = useSearchParams();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [urlData, setUrlData] = useState(null)
-  
+  const [urlData, setUrlData] = useState(null);
 
   const navigate = useNavigate();
 
@@ -20,7 +17,7 @@ export const Quiz = () => {
     const encryptedParams = searchParams.get('data');
     if (encryptedParams) {
       const decryptedData = decryptQueryParams(encryptedParams);
-      setUrlData(decryptedData)
+      setUrlData(decryptedData);
       if (decryptedData) {
         fetchQuestions(decryptedData);
       } else {
@@ -31,8 +28,6 @@ export const Quiz = () => {
       navigate('*');
     }
   }, []);
-
-   
 
   const fetchQuestions = async (decryptedData) => {
     try {
@@ -65,45 +60,58 @@ export const Quiz = () => {
     }
   };
 
-  const calculateScore = async () => {
-    const data = {answers,title:urlData.title,type:urlData.type}
-    sessionStorage.setItem('pendingQuizResult', JSON.stringify(data));
-    navigate('/result/quiz?redirect=testStatus')
+  const handlePrevious = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
   };
 
-  if (!questions.length) return <div>Loading...</div>;
+  const calculateScore = () => {
+    const data = { answers, title: urlData.title, type: urlData.type };
+    sessionStorage.setItem('pendingQuizResult', JSON.stringify(data));
+    navigate('/result/quiz?redirect=testStatus');
+  };
+
+  if (isLoading || !questions.length) return <div className="text-center text-xl font-semibold py-20">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+        {/* Quiz Title */}
+        {urlData?.title && (
+          <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">{urlData.title}</h1>
+        )}
+        
+        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-2xl font-semibold text-gray-800">
               Question {currentQuestion + 1} of {questions.length}
             </h2>
-            <span className="text-gray-600">
-              Score needed: {passingScore}/{questions.length}
+            <span className="text-gray-600 text-lg">
+              Passing Score: {passingScore}/{questions.length}
             </span>
           </div>
-          <div className="h-2 bg-gray-200 rounded">
+          <div className="h-2 bg-gray-200 rounded overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded"
+              className="h-full bg-blue-500 transition-all duration-300"
               style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
             ></div>
           </div>
         </div>
 
+        {/* Question & Options */}
         <div className="mb-8">
-          <h3 className="text-xl mb-4">{questions[currentQuestion].question}</h3>
+          <h3 className="text-xl font-medium mb-4 text-gray-900">{questions[currentQuestion].question}</h3>
           <div className="space-y-4">
             {questions[currentQuestion].options.map((option, index) => (
               <button
                 key={index}
                 onClick={() => handleAnswer(index)}
-                className={`w-full p-4 text-left rounded-lg border ${answers[questions[currentQuestion].id] === index
-                  ? 'bg-blue-50 border-blue-500'
-                  : 'border-gray-200 hover:bg-gray-50'
-                  }`}
+                className={`w-full p-4 text-left rounded-lg border transition duration-200
+                  ${answers[questions[currentQuestion].id] === index
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'border-gray-300 hover:bg-gray-100'}`}
               >
                 {option}
               </button>
@@ -111,18 +119,27 @@ export const Quiz = () => {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        {/* Navigation Buttons */}
+        <div className="flex justify-between">
+          <button
+            onClick={handlePrevious}
+            disabled={currentQuestion === 0}
+            className={`px-6 py-2 rounded-lg text-lg font-semibold transition duration-200
+              ${currentQuestion === 0
+                ? 'bg-gray-300 cursor-not-allowed text-gray-600'
+                : 'bg-gray-500 hover:bg-gray-600 text-white'}`}
+          >
+            Previous
+          </button>
           <button
             onClick={handleNext}
             disabled={answers[questions[currentQuestion].id] === undefined}
-            className={`px-6 py-2 rounded-lg ${answers[questions[currentQuestion].id] === undefined
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
+            className={`px-6 py-2 rounded-lg text-lg font-semibold transition duration-200
+              ${answers[questions[currentQuestion].id] === undefined
+                ? 'bg-gray-300 cursor-not-allowed text-gray-600'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
           >
-            {
-              isLoading ? 'Submitting...' : currentQuestion === questions.length - 1 ? 'Finish' : 'Next'
-            }
+            {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
           </button>
         </div>
       </div>
