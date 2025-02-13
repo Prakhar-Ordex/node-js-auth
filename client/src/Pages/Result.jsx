@@ -18,6 +18,7 @@ export const Result = () => {
 
   const getResult = async () => {
     const resultData = JSON.parse(sessionStorage.getItem('pendingQuizResult'));
+    const answers = JSON.parse(sessionStorage.getItem('answers'));
     console.log(resultData);
     
     if (!resultData) {
@@ -34,7 +35,7 @@ export const Result = () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(resultData),
+        body: JSON.stringify({...resultData,answers}),
       });
 
       const result = await response.json();
@@ -63,6 +64,7 @@ export const Result = () => {
       navigate('/skill-tests');
     } finally {
       setIsLoading(false);
+      sessionStorage.clear();
     }
   }
 
