@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
+import companyLogo from '../asset/logo.png'
 
 const CertificateCanvas = forwardRef(({
   recipientName = "Prakhar Tripathi",
@@ -10,8 +11,8 @@ const CertificateCanvas = forwardRef(({
   signerTitle = "CTO, HackerRank",
   width = 1000,
   height = 700,
-  companyLogo = null ,// New prop for company logo
-  signatureImage = null 
+  // companyLogo = null ,// New prop for company logo
+  // signatureImage = null 
 }, ref) => {
   const canvasRef = useRef(null);
   const logoRef = useRef(null);
@@ -27,6 +28,22 @@ const CertificateCanvas = forwardRef(({
       const img = new Image();
       img.onload = () => {
         logoRef.current = img;
+        resolve(img);
+      };
+      img.onerror = reject;
+      img.src = companyLogo;
+    });
+  };
+  const signatureLogo = () => {
+    return new Promise((resolve, reject) => {
+      if (!companyLogo) {
+        resolve(null);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        signatureRef.current = img;
         resolve(img);
       };
       img.onerror = reject;
@@ -87,7 +104,7 @@ const CertificateCanvas = forwardRef(({
 
     // Draw company logo if provided
     if (logoRef.current) {
-      const logoSize = 90;
+      const logoSize = 115;
       const aspectRatio = logoRef.current.width / logoRef.current.height;
       const logoWidth = aspectRatio >= 1 ? logoSize : logoSize * aspectRatio;
       const logoHeight = aspectRatio >= 1 ? logoSize / aspectRatio : logoSize;
@@ -95,14 +112,14 @@ const CertificateCanvas = forwardRef(({
       ctx.drawImage(
         logoRef.current,
         width/2 - logoWidth/2,
-        70,
+        50,
         logoWidth,
         logoHeight
       );
     }
 
     // Draw main title
-    ctx.font = 'bold 48px serif';
+    ctx.font = 'bold 44px serif';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.fillText('Certificate of Accomplishment', width/2, 200);
@@ -209,6 +226,7 @@ const CertificateCanvas = forwardRef(({
       ctx.scale(dpr, dpr);
       
       await loadLogo();
+      await signatureLogo();
       await drawCertificate(ctx);
     };
 

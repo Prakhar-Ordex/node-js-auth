@@ -147,8 +147,8 @@ export const Certificate = () => {
               certificationName={cert.quizName}
               earnedDate={new Date(cert.createdDate).toLocaleDateString()}
               certificateId={cert.certificate}
-              signerName="Quiz Master"
-              signerTitle="Chief Quiz Officer"
+              // signerName="Quiz Master"
+              // signerTitle="Chief Quiz Officer"
               width={ 1000}
               height={700}
             />
