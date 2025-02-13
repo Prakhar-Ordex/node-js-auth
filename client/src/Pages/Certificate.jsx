@@ -37,13 +37,16 @@ export const Certificate = () => {
     const fetchCertificate = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3000/apis/certificates/${id}`);
+        const response = await fetch(`http://localhost:3000/apis/certificates/${id}`,{
+          credentials:'include',
+        });
         const data = await response.json();
 
         console.log(data)
         setCert(data);
+        setIsAuthenticated(data.isAuth);
         if (response.status === 404) {
-          navigate("/*")
+          navigate("*")
         }
       } catch (error) {
         console.error('Error:', error);
@@ -54,23 +57,6 @@ export const Certificate = () => {
     fetchCertificate();
   }, [id]);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const login = isLogin();
-        if (!login) {
-          setIsAuthenticated(false);
-          return;
-        }
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        setIsAuthenticated(false);
-      }
-    };
-    
-    checkAuth();
-  }, []);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(shareUrl);

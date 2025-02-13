@@ -23,11 +23,12 @@ const genrateCertificate = async (req, res) => {
 
 const findCertificatesByID = async (req, res) => {
   try {
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",req.isAuth)
     const certificate = await Certificate.findByPk(req.params.id);
     if (!certificate) {
       return res.status(404).json({ message: 'Certificate not found' });
     }
-    const user = await User.findOne({ where: { id: certificate.dataValues.userId } });
+    const user = await User.findOne({ where: { id: certificate.userId } });
 
     const result = await Result.findOne({where:{id:certificate.dataValues.quizId}})
 
@@ -43,7 +44,8 @@ const findCertificatesByID = async (req, res) => {
       certificate:certificateData.id,
       name:userData.username,
       quizName:resultData.quizName,
-      createdDate:certificateData.createdAt
+      createdDate:certificateData.createdAt,
+      isAuth:req.isAuth
     });
 
     // res.status(201), json(certificate);
