@@ -1,77 +1,143 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isLogin } from '../utils/auth';
-import { toast } from 'react-toastify';
-
 
 const Header = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    
-    const [login,setLogin ] = useState(false);
-    useEffect(()=>{
-        setLogin(isLogin())
-    },[location])
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [login, setLogin] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const handleLogout = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/auth/logout', {
-                method: 'POST',
-                credentials: 'include', 
-            });
-            if (response.status === 202) { 
-                localStorage.clear();
-                toast.success("Logout successful");
-                navigate('/');
-            } else {
-                console.error("Logout failed:", response.statusText);
-            }
-        } catch (error) {
-            console.error("Error during logout:", error);
-            toast.error("Failed to logout");
-        }
-    };
+  useEffect(()=>{
+    setLogin(isLogin())
+},[location])
 
-    return (
-        <>
-            <header>
-                <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
-                    <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-                        <div className="flex items-center">
-                            <img src="https://flowbite.com/docs/images/logo.svg" className="mr-3 h-6 sm:h-9" alt="Flowbite Logo" />
-                            <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Flowbite</span>
-                        </div>
-                       
-                        <div className=" justify-between items-center  lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
-                            <ul className="flex  mt-4 font-medium md:flex-row md:space-x-8 lg:mt-0">
-                                <li>
-                                    <Link to="/" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Home</Link>
-                                </li>
-                                <li>
-                                    <Link to="/users" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Users</Link>
-                                </li>    
-                                 <li>
-                                    <Link to="/profile" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Profile</Link>
-                                </li> 
-                                <li>
-                                    <Link to="/skill-tests" className="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700">Quiz</Link>
-                                </li>  
-                            </ul>
-                        </div>
-                        <div className="flex items-center lg:order-2">
-                            
-                           {
-                           login ?
-                            <button  onClick={handleLogout} className="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">Log Out</button>
-                            :
-                            <Link to="/signin" className="text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800">Log in</Link> 
-                           }
-                        </div>
-                    </div>
-                </nav>
-            </header>
-        </>
-    )
-}
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (response.status === 202) {
+        localStorage.clear();
+        navigate('/');
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
-export default Header
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+      <nav className="px-4 mx-auto max-w-7xl">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo Section */}
+          <div className="flex items-center space-x-3">
+            <img 
+              src="/api/placeholder/36/36"
+              alt="Logo" 
+              className="w-9 h-9"
+            />
+            <span className="text-xl font-semibold text-gray-800">
+              Brand
+            </span>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:block">
+            <div className="flex items-center space-x-8">
+              <Link 
+                to="/" 
+                className="px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+              >
+                Home
+              </Link>
+              <Link 
+                to="/users" 
+                className="px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+              >
+                Users
+              </Link>
+              <Link 
+                to="/profile" 
+                className="px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+              >
+                Profile
+              </Link>
+              <Link 
+                to="/skill-tests" 
+                className="px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-blue-600"
+              >
+                Quiz
+              </Link>
+            </div>
+          </div>
+
+          {/* Auth Section */}
+          <div className="flex items-center space-x-4">
+            {login ? (
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Log Out
+              </button>
+            ) : (
+              <Link
+                to="/signin"
+                className="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Log In
+              </Link>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 md:hidden"
+            >
+              <div className="w-6 h-0.5 bg-gray-600 mb-1"></div>
+              <div className="w-6 h-0.5 bg-gray-600 mb-1"></div>
+              <div className="w-6 h-0.5 bg-gray-600"></div>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <Link
+                to="/"
+                className="block px-3 py-2 text-base font-medium text-gray-600 rounded-md hover:bg-gray-50"
+              >
+                Home
+              </Link>
+              <Link
+                to="/users"
+                className="block px-3 py-2 text-base font-medium text-gray-600 rounded-md hover:bg-gray-50"
+              >
+                Users
+              </Link>
+              <Link
+                to="/profile"
+                className="block px-3 py-2 text-base font-medium text-gray-600 rounded-md hover:bg-gray-50"
+              >
+                Profile
+              </Link>
+              <Link
+                to="/skill-tests"
+                className="block px-3 py-2 text-base font-medium text-gray-600 rounded-md hover:bg-gray-50"
+              >
+                Quiz
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+    </header>
+  );
+};
+
+export default Header;
