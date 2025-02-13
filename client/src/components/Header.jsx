@@ -21,6 +21,7 @@ const Header = () => {
       
       if (response.status === 202) {
         localStorage.clear();
+        sessionStorage.clear();
         navigate('/');
       }
     } catch (error) {

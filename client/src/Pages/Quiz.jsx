@@ -11,29 +11,45 @@ export const Quiz = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [urlData, setUrlData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(null);
+  const [timeRemaining, setTimeRemaining] = useState(30);
 
   const navigate = useNavigate();
 
-  // Load saved progress from localStorage
+  // Load saved progress and timer from localStorage
   useEffect(() => {
     const savedProgress = localStorage.getItem('quizProgress');
+    console.log(savedProgress)
     if (savedProgress) {
-      const { answers: savedAnswers, currentQuestion: savedCurrentQuestion } = JSON.parse(savedProgress);
+      const { 
+        answers: savedAnswers, 
+        currentQuestion: savedCurrentQuestion,
+        timeRemaining: savedTimeRemaining,
+        startTime: savedStartTime 
+      } = JSON.parse(savedProgress);
+
       setAnswers(savedAnswers);
       setCurrentQuestion(savedCurrentQuestion);
+
+      // Calculate remaining time based on saved start time
+      if (savedStartTime && savedTimeRemaining) {
+        const elapsedTime = Math.floor((Date.now() - savedStartTime) / 1000);
+        const remainingTime = Math.max(0, savedTimeRemaining - elapsedTime);
+        setTimeRemaining(remainingTime);
+      }
     }
   }, []);
 
-  // Save progress to localStorage whenever answers or currentQuestion changes
+  // Save progress and timer to localStorage
   useEffect(() => {
     if (questions.length > 0) {
       localStorage.setItem('quizProgress', JSON.stringify({
         answers,
         currentQuestion,
+        timeRemaining,
+        startTime: Date.now() // Save current timestamp
       }));
     }
-  }, [answers, currentQuestion]);
+  }, [answers, currentQuestion, timeRemaining]);
 
   useEffect(() => {
     const encryptedParams = searchParams.get('data');
@@ -42,8 +58,10 @@ export const Quiz = () => {
       setUrlData(decryptedData);
       if (decryptedData) {
         fetchQuestions(decryptedData);
-        // Set 30-minute timer
-        setTimeRemaining(30 * 60);
+        // Only set initial time if it's not already set
+        if (timeRemaining === null) {
+          setTimeRemaining(30 * 60); // 30 minutes in seconds
+        }
       } else {
         toast.error('Link has expired or is invalid');
         navigate('/');
@@ -55,12 +73,13 @@ export const Quiz = () => {
 
   // Timer countdown
   useEffect(() => {
-    if (timeRemaining === null) return;
+    if (timeRemaining === null || timeRemaining <= 0) return; // Prevent timer from starting if timeRemaining is null or 0
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
+          toast.warning('Time is up!')
           calculateScore();
           return 0;
         }

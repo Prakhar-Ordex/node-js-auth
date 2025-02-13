@@ -52,7 +52,8 @@ const Login = () => {
         }
 
         if (pendingResult && certificate === 'certificate') {
-          navigate('/result/login?redirect=certificate');
+          // navigate('/result/login?redirect=certificate');
+          navigate(-1);
           return;
         }
 
