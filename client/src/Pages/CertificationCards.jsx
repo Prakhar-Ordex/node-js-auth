@@ -63,6 +63,7 @@ const CertificationCards = () => {
         <div>
           <Link
             to={`/quiz/${title}?data=${generateEncryptedParams(title, type)}`}
+            onClick={()=> localStorage.removeItem('quizProgress')}
             className="mt-4 px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 transition-colors"
           >
             Get Certified
