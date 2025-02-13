@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { decryptQueryParams } from '../utils/dataEncrypt';
@@ -6,54 +6,14 @@ import { decryptQueryParams } from '../utils/dataEncrypt';
 export const Quiz = () => {
   const [searchParams] = useSearchParams();
   const [questions, setQuestions] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(() => {
-    return parseInt(sessionStorage.getItem('currentQuestion')) || 0;
-  });
-  const [answers, setAnswers] = useState(() => {
-    return JSON.parse(sessionStorage.getItem('answers')) || {};
-  });
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [urlData, setUrlData] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(null); // 5 minutes timer
-  console.log()
 
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    sessionStorage.setItem('currentQuestion', currentQuestion);
-    sessionStorage.setItem('answers', JSON.stringify(answers));
-  }, [currentQuestion, answers]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prevTime => {
-        if (prevTime <= 1) {
-          clearInterval(timer);
-          calculateScore();
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft]);
-
-  const fetchQuestions = async (decryptedData) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`http://localhost:3000/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`);
-      const data = await response.json();
-      setQuestions(data.questions);
-      setTimeLeft(data.time)
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-      toast.error('Failed to load questions');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useMemo(() => {
     const encryptedParams = searchParams.get('data');
     if (encryptedParams) {
       const decryptedData = decryptQueryParams(encryptedParams);
@@ -69,19 +29,32 @@ export const Quiz = () => {
     }
   }, []);
 
+  const fetchQuestions = async (decryptedData) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`http://localhost:3000/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`);
+      const data = await response.json();
+      setQuestions(data);
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      toast.error('Failed to load questions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const passingScore = Math.ceil(questions.length * 0.85);
 
   const handleAnswer = (optionIndex) => {
-    setAnswers(prev => ({
-      ...prev,
+    setAnswers({
+      ...answers,
       [questions[currentQuestion].id]: optionIndex
-    }));
-    console.log(optionIndex)
+    });
   };
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
+      setCurrentQuestion(currentQuestion + 1);
     } else {
       calculateScore();
     }
@@ -89,12 +62,12 @@ export const Quiz = () => {
 
   const handlePrevious = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1);
+      setCurrentQuestion(currentQuestion - 1);
     }
   };
 
   const calculateScore = () => {
-    const data = { title: urlData.title, type: urlData.type };
+    const data = { answers, title: urlData.title, type: urlData.type };
     sessionStorage.setItem('pendingQuizResult', JSON.stringify(data));
     navigate('/result/quiz?redirect=testStatus');
   };
@@ -108,11 +81,6 @@ export const Quiz = () => {
         {urlData?.title && (
           <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">{urlData.title}</h1>
         )}
-        
-        {/* Timer */}
-        <div className="text-right text-red-500 text-lg font-semibold mb-4">
-          Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
-        </div>
         
         {/* Progress Bar */}
         <div className="mb-8">

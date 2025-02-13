@@ -5,16 +5,14 @@ const Question = require("../models/question.model");
 const questions = async (req, res) => {
   try {
     const { type, title } = req.query;
-   
+    console.log("type and title > ", type, title);
 
     if (type && title) {
       const questions = await Question.findAll({
         attributes: ['id', 'question', 'options'],
         where: { type, title },
       });
-      const time = questions.length * 60;
-
-      res.status(200).json({questions:questions, time:time});
+      res.status(200).json(questions);
     } else {
       const questions = await Question.findAll({
         attributes: ['id', 'question', 'options'],
