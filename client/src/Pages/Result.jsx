@@ -3,9 +3,9 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const Result = () => {
-  const navigate = useNavigate  ();
+  const navigate = useNavigate();
   const query = new URLSearchParams(useLocation().search);
-  const {path} = useParams();
+  const { path } = useParams();
   const redirect = query.get("redirect");
   const [isPass, setPass] = useState(null);
   const [score, setScore] = useState(null);
@@ -13,70 +13,40 @@ export const Result = () => {
   const [questions, setQuestions] = useState([]);
   const [certificateId, setCertificateID] = useState(null);
   const [passingScore, setPassingScore] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
 
   const getResult = async () => {
-    const resultData = JSON.parse(sessionStorage.getItem('pendingQuizResult'));
-    console.log(resultData);
-    
-    if (!resultData) {
+    const result = JSON.parse(sessionStorage.getItem('pendingQuizResult'));
+    // console.log(resultData);
+
+    if (!result) {
       toast.error("No quiz result found");
       navigate('/skill-tests');
       return;
     }
+    setPass(result.passingStatus);
+    setScore(result.score);
+    setQuestions(result.totalQuestions);
+    setPassingScore(result.passingScore);
 
-    try {
-      setIsLoading(true);
-      const response = await fetch('http://localhost:3000/apis/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(resultData),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 410) {
-          toast.warn("Please SignIn or SignUp to generate your certificate");
-          navigate('/signin?redirect=certificate');
-          return;
-        }
-        throw new Error(result.message || 'Failed to submit quiz results');
-      }
-
-      setPass(result.passingStatus);
-      setScore(result.score);
-      setQuestions(result.totalQuestions);
-      setPassingScore(result.passingScore);
-      
-      if (result.passingStatus) {
-        setCertificateID(result.certificateID);
-      }
-
-    } catch (error) {
-      console.error('Error submitting results:', error);
-      toast.error(error.message || 'Failed to process quiz results');
-      navigate('/skill-tests');
-    } finally {
-      setIsLoading(false);
+    if (result.passingStatus) {
+      setCertificateID(result.certificateID);
     }
+
   }
 
   useEffect(() => {
     if (score || redirect === "certificate" || redirect === "testStatus" || path === "quiz" || path === "login") {
       getResult();
-    }else{
+    } else {
       navigate("/*")
     }
   }, [])
 
-  if(isLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">

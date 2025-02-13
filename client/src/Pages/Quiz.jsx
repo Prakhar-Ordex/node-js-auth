@@ -10,6 +10,7 @@ export const Quiz = () => {
   const [answers, setAnswers] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [urlData, setUrlData] = useState(null);
+  const [isSubmiting, setIsSubmiting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -66,10 +67,42 @@ export const Quiz = () => {
     }
   };
 
-  const calculateScore = () => {
-    const data = { answers, title: urlData.title, type: urlData.type };
-    sessionStorage.setItem('pendingQuizResult', JSON.stringify(data));
-    navigate('/result/quiz?redirect=testStatus');
+  const calculateScore = async () => {
+    const resultData = { answers, title: urlData.title, type: urlData.type };
+
+    try {
+      setIsSubmiting(true);
+      const response = await fetch('http://localhost:3000/apis/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(resultData),
+      });
+
+      if (!response.ok) {
+        if (response.status === 410) {
+          toast.warn("Please SignIn or SignUp to generate your certificate");
+          navigate('/signin?redirect=certificate');
+          return;
+        }
+        throw new Error(result.message || 'Failed to submit quiz results');
+      }
+
+      const result = await response.json();
+
+      sessionStorage.setItem('pendingQuizResult', JSON.stringify(result));
+      navigate('/result/quiz?redirect=testStatus');
+
+    } catch (error) {
+      console.error('Error submitting results:', error);
+      toast.error(error.message || 'Failed to process quiz results');
+      navigate('/skill-tests');
+    } finally {
+      setIsSubmiting(false);
+    }
+
   };
 
   if (isLoading || !questions.length) return <div className="text-center text-xl font-semibold py-20">Loading...</div>;
@@ -81,7 +114,7 @@ export const Quiz = () => {
         {urlData?.title && (
           <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">{urlData.title}</h1>
         )}
-        
+
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
@@ -139,7 +172,7 @@ export const Quiz = () => {
                 ? 'bg-gray-300 cursor-not-allowed text-gray-600'
                 : 'bg-blue-500 hover:bg-blue-600 text-white'}`}
           >
-            {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
+            {currentQuestion === questions.length - 1 ? isSubmiting ? 'Loading...' : 'Finish' : 'Next'}
           </button>
         </div>
       </div>
