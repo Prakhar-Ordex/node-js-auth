@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { isLogin } from '../utils/auth';
+import { API } from '../constant/api';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/auth/logout', {
+      const response = await fetch(`${API}/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

@@ -65,14 +65,14 @@ const authenticate = async (req, res, next) => {
                 res.cookie("access_token", newAccessToken, {
                     httpOnly: true,
                     secure: true,
-                    sameSite: "Strict",
+                    // sameSite: "Strict",
                     maxAge: 10 * 1000, // 15 minutes
                 });
 
                 res.cookie("refresh_token", refreshToken, {
                     httpOnly: true,
                     secure: true,
-                    sameSite: "Strict",
+                    // sameSite: "Strict",
                     maxAge: 30 * 60 * 1000, // 7 days
                 });
 

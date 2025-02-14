@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API } from '../constant/api';
 
 const Profile = () => {
     const [data, setData] = useState(null);
@@ -9,7 +10,7 @@ const Profile = () => {
   
     const fetchData = async () => {
         try {
-          const response = await fetch('http://localhost:3000/auth/profile', {
+          const response = await fetch(`${API}/auth/profile`, {
             credentials: 'include'
           });
           const jsonData = await response.json();

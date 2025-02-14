@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import { formatedDate } from '../utils/dateFormater';
 import { Link, useNavigate } from 'react-router-dom';
+import { API } from '../constant/api';
 
 const User = () => {
   const [data, setData] = useState([]);
@@ -11,7 +12,7 @@ const User = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/apis/read', {
+      const response = await fetch(`${API}/apis/read`, {
         credentials: 'include'
       });
       const jsonData = await response.json();
@@ -35,7 +36,7 @@ const User = () => {
   const deleteEmployee = async (id) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:3000/apis/delete/${id}`, {
+      const response = await fetch(`${API}/apis/delete/${id}`, {
         method: 'DELETE',
         credentials: 'include'
       });

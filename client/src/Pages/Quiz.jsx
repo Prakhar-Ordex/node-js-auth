@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { decryptQueryParams } from '../utils/dataEncrypt';
+import { API } from '../constant/api';
 
 export const Quiz = () => {
   const [searchParams] = useSearchParams();
@@ -90,7 +91,7 @@ export const Quiz = () => {
   const fetchQuestions = async (decryptedData) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3000/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`, {
+      const response = await fetch(`${API}/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`, {
         credentials: 'include'
       });
       const { questions, totalTime } = await response.json(); // Destructure questions and totalTime from response
@@ -148,7 +149,7 @@ export const Quiz = () => {
 
     try {
       setIsSubmitting(true);
-      const response = await fetch('http://localhost:3000/apis/submit', {
+      const response = await fetch(`${API}/apis/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

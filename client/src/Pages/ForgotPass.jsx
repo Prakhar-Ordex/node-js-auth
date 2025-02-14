@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Input from '../components/common/Input'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
+import { API } from '../constant/api';
 
 const ForgotPass = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const ForgotPass = () => {
       return;
     }
     try {
-      const loginUser = await fetch('http://localhost:3000/auth/signIn', {
+      const loginUser = await fetch(`${API}/auth/signIn`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import CertificateCanvas from "../components/CertificateGenrator";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { isLogin } from "../utils/auth";
+import { API } from "../constant/api";
 
 export const Certificate = () => {
   const { id } = useParams();
@@ -37,7 +38,7 @@ export const Certificate = () => {
     const fetchCertificate = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3000/apis/certificates/${id}`,{
+        const response = await fetch(`${API}/apis/certificates/${id}`,{
           credentials:'include',
         });
         const data = await response.json();

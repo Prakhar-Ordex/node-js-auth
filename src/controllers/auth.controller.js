@@ -59,13 +59,13 @@ const singIn = async (req, res) => {
             .cookie('access_token', access_token, {
                 httpOnly: true,
                 secure: true,
-                sameSite: 'Strict',
+                // sameSite: 'Strict',
                 maxAge: accessTokenMaxAge,
             })
             .cookie('refresh_token', refresh_token, {
                 httpOnly: true,
                 secure: true,
-                sameSite: 'Strict',
+                // sameSite: 'Strict',
                 maxAge: refreshTokenMaxAge,
             })
             .json({

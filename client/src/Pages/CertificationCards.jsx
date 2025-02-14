@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { generateEncryptedParams } from '../utils/dataEncrypt';
+import { API } from '../constant/api';
 
 
 // Role icon SVG component
@@ -35,7 +36,7 @@ const CertificationCards = () => {
     const fetchQuiz = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:3000/apis/allquiz');
+        const response = await fetch(`${API}/apis/allquiz`);
         const data = await response.json();
 
         const roleCertificateData = data?.filter((item) => item.type.trim() === "role");

@@ -3,6 +3,7 @@ import UserDetailComponent from '../components/common/UserDetailComponent'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import { dateFormated } from '../utils/dateFormater';
+import { API } from '../constant/api';
 
 const AddUser = () => {
   const navigate = useNavigate();;
@@ -16,7 +17,7 @@ const AddUser = () => {
 
   const findEmployees = async () => {
     try {
-      const user = await fetch(`http://localhost:3000/apis/users/${id}`, {
+      const user = await fetch(`${API}/apis/users/${id}`, {
         credentials: 'include'
       })
       const data = await user.json();
@@ -48,7 +49,7 @@ const AddUser = () => {
     }
 
     try {
-      const api = id ? `http://localhost:3000/apis/update/${id}` : `http://localhost:3000/apis/create`;
+      const api = id ? `${API}/apis/update/${id}` : `${API}/apis/create`;
       const User = await fetch(api, {
         method: id ? 'PATCH' : 'POST',
         headers: {
