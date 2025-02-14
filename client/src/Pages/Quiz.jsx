@@ -21,7 +21,7 @@ export const Quiz = () => {
   // Load saved progress and timer from localStorage
   useEffect(() => {
     const savedProgress = localStorage.getItem('quizProgress');
-    console.log(savedProgress)
+    // console.log(savedProgress)
     if (savedProgress) {
       const {
         answers: savedAnswers,
