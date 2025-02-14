@@ -13,6 +13,7 @@ export const Quiz = () => {
   const [urlData, setUrlData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(null);
+  const [showTimeUpModal, setShowTimeUpModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -71,14 +72,13 @@ export const Quiz = () => {
 
   // Timer countdown
   useEffect(() => {
-    if (timeRemaining === null || timeRemaining <= 0) return; // Prevent timer from starting if timeRemaining is null or 0
+    if (timeRemaining === null || timeRemaining <= 0) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          toast.warning('Time is up!');
-          calculateScore();
+          setShowTimeUpModal(true); // Show modal instead of auto-submitting
           return 0;
         }
         return prev - 1;
@@ -181,6 +181,12 @@ export const Quiz = () => {
     }
   };
 
+  // Handle back button click in time-up modal
+  const handleBack = () => {
+    localStorage.removeItem('quizProgress');
+    navigate('/skill-tests');
+  };
+
   if (isLoading || !questions.length) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -193,6 +199,45 @@ export const Quiz = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      {/* Time Up Modal */}
+      {showTimeUpModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 transform transition-all">
+            <div className="text-center">
+              {/* Warning Icon */}
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+                <svg className="h-10 w-10 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Time's Up!
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Your time has expired. Would you like to submit your answers or return to the tests page?
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={handleBack}
+                  className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                >
+                  Back to Tests
+                </button>
+                <button
+                  onClick={calculateScore}
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:bg-blue-400"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Answers'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
