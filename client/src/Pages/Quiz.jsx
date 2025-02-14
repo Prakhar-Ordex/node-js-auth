@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { decryptQueryParams } from '../utils/dataEncrypt';
 import { API } from '../constant/api';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export const Quiz = () => {
   const [searchParams] = useSearchParams();
@@ -22,11 +23,11 @@ export const Quiz = () => {
     const savedProgress = localStorage.getItem('quizProgress');
     console.log(savedProgress)
     if (savedProgress) {
-      const { 
-        answers: savedAnswers, 
+      const {
+        answers: savedAnswers,
         currentQuestion: savedCurrentQuestion,
         timeRemaining: savedTimeRemaining,
-        startTime: savedStartTime 
+        startTime: savedStartTime
       } = JSON.parse(savedProgress);
 
       setAnswers(savedAnswers);
@@ -118,7 +119,7 @@ export const Quiz = () => {
       document.body.style.webkitUserSelect = 'auto';
       document.body.style.msUserSelect = 'auto';
       document.body.style.mozUserSelect = 'auto';
-      
+
       document.removeEventListener('copy', preventCopyPaste);
       document.removeEventListener('paste', preventCopyPaste);
       document.removeEventListener('contextmenu', preventRightClick);
@@ -139,9 +140,33 @@ export const Quiz = () => {
           navigate('/signin?redirect=questions');
           return;
         }
+        throw new Error("Failed to fetch questions.")
       }
+
       setQuestions(questions);
-      if (timeRemaining === null) {
+      console.log(timeRemaining)
+      // Check if we have saved progress
+      const savedProgress = localStorage.getItem('quizProgress');
+      // if (savedProgress) {
+      //   const { timeRemaining: savedTimeRemaining, startTime: savedStartTime } = JSON.parse(savedProgress);
+
+      //   if (savedStartTime && savedTimeRemaining !== null) {
+      //     const elapsedTime = Math.floor((Date.now() - savedStartTime) / 1000);
+      //     const remainingTime = Math.max(0, savedTimeRemaining - elapsedTime);
+      //     setTimeRemaining(remainingTime);
+      //     return;
+      //   }
+      // }
+
+      // If no saved time, set from API response
+      // setTimeRemaining(totalTime);
+
+      // if (timeRemaining === null) {
+      //   console.log("first")
+      //   setTimeRemaining(totalTime); // Set timeRemaining to totalTime in seconds
+      // }
+
+      if(!savedProgress){
         setTimeRemaining(totalTime); // Set timeRemaining to totalTime in seconds
       }
     } catch (error) {
@@ -225,11 +250,7 @@ export const Quiz = () => {
   };
 
   if (isLoading || !questions.length) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingSpinner/>
   }
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
@@ -247,14 +268,14 @@ export const Quiz = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              
+
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Time's Up!
               </h3>
               <p className="text-gray-600 mb-6">
                 Your time has expired. Would you like to submit your answers or return to the tests page?
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={handleBack}
@@ -298,7 +319,7 @@ export const Quiz = () => {
               <span>Passing Score: {passingScore}/{questions.length}</span>
             </div>
             <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full bg-blue-500 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               ></div>
@@ -327,13 +348,13 @@ export const Quiz = () => {
                     onPaste={preventCopyPaste}
                     onContextMenu={preventRightClick}
                     className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center gap-3 select-none
-                      ${isSelected 
-                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                      ${isSelected
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-200 hover:border-blue-200 hover:bg-blue-50'}`}
                   >
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center
-                      ${isSelected 
-                        ? 'border-blue-500 bg-blue-500' 
+                      ${isSelected
+                        ? 'border-blue-500 bg-blue-500'
                         : 'border-gray-300'}`}
                     >
                       {isSelected && (
@@ -363,7 +384,7 @@ export const Quiz = () => {
             </button>
             <button
               onClick={handleNext}
-              disabled={answers[questions[currentQuestion].id] === undefined}
+              disabled={answers[questions[currentQuestion].id] === undefined  || isSubmitting}
               className={`px-6 py-2 rounded-lg text-white font-semibold transition-all duration-200
                 ${answers[questions[currentQuestion].id] === undefined
                   ? 'bg-gray-300 cursor-not-allowed'

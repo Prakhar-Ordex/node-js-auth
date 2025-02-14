@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { generateEncryptedParams } from '../utils/dataEncrypt';
 import { API } from '../constant/api';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 
 // Role icon SVG component
@@ -78,11 +79,7 @@ const CertificationCards = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <h1 className="text-2xl">Loading.......</h1>
-      </div>
-    );
+    return <LoadingSpinner/>
   }
 
   return (
