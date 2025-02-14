@@ -104,7 +104,7 @@ const CertificateCanvas = forwardRef(({
 
     // Draw company logo if provided
     if (logoRef.current) {
-      const logoSize = 115;
+      const logoSize = 150;
       const aspectRatio = logoRef.current.width / logoRef.current.height;
       const logoWidth = aspectRatio >= 1 ? logoSize : logoSize * aspectRatio;
       const logoHeight = aspectRatio >= 1 ? logoSize / aspectRatio : logoSize;
