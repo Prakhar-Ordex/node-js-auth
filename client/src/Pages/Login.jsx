@@ -13,7 +13,7 @@ const Login = () => {
   const [isLoading,setIsLoading] = useState(false);
    // Check if there's a pending quiz result
    const pendingResult = sessionStorage.getItem('pendingQuizResult');
-   const certificate = searchParams.get('redirect');
+   const queryData = searchParams.get('redirect');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,13 +46,16 @@ const Login = () => {
           toast.success("Logged in successfully")
         }
 
-
         if (loginUser.status === 210) {
           toast.warning(data?.message || "Aleredy login");
         }
 
-        if (pendingResult && certificate === 'certificate') {
-          // navigate('/result/login?redirect=certificate');
+        if (pendingResult && queryData === 'certificate') {
+          navigate(-1);
+          return;
+        }
+
+        if (queryData === 'questions') {
           navigate(-1);
           return;
         }

@@ -7,18 +7,22 @@ const questions = async (req, res) => {
     const { type, title } = req.query;
     console.log("type and title > ", type, title);
 
+    let questions;
     if (type && title) {
-      const questions = await Question.findAll({
+      questions = await Question.findAll({
         attributes: ['id', 'question', 'options'],
         where: { type, title },
       });
-      res.status(200).json(questions);
     } else {
-      const questions = await Question.findAll({
+      questions = await Question.findAll({
         attributes: ['id', 'question', 'options'],
       });
-      res.status(200).json(questions);
     }
+
+    // Calculate total time based on the number of questions
+    const totalTime = questions.length * 60; // 1 minute per question
+
+    res.status(200).json({ questions, totalTime }); // Include total time in the response
 
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -11,7 +11,7 @@ export const Quiz = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [urlData, setUrlData] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(30);
+  const [timeRemaining, setTimeRemaining] = useState(null);
 
   const navigate = useNavigate();
 
@@ -59,9 +59,6 @@ export const Quiz = () => {
       if (decryptedData) {
         fetchQuestions(decryptedData);
         // Only set initial time if it's not already set
-        if (timeRemaining === null) {
-          setTimeRemaining(30 * 60); // 30 minutes in seconds
-        }
       } else {
         toast.error('Link has expired or is invalid');
         navigate('/');
@@ -79,7 +76,7 @@ export const Quiz = () => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          toast.warning('Time is up!')
+          toast.warning('Time is up!');
           calculateScore();
           return 0;
         }
@@ -93,9 +90,22 @@ export const Quiz = () => {
   const fetchQuestions = async (decryptedData) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3000/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`);
-      const data = await response.json();
-      setQuestions(data);
+      const response = await fetch(`http://localhost:3000/apis/questions?type=${decryptedData.type}&title=${decryptedData.title}`, {
+        credentials: 'include'
+      });
+      const { questions, totalTime } = await response.json(); // Destructure questions and totalTime from response
+
+      if (!response.ok) {
+        if (response.status === 410) {
+          toast.error("You Don't have account please login first");
+          navigate('/signin?redirect=questions');
+          return;
+        }
+      }
+      setQuestions(questions);
+      if (timeRemaining === null) {
+        setTimeRemaining(totalTime); // Set timeRemaining to totalTime in seconds
+      }
     } catch (error) {
       console.error('Error fetching questions:', error);
       toast.error('Failed to load questions');
