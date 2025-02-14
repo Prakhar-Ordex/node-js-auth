@@ -88,6 +88,43 @@ export const Quiz = () => {
     return () => clearInterval(timer);
   }, [timeRemaining]);
 
+  // Add event handlers to prevent copying
+  const preventCopyPaste = (e) => {
+    e.preventDefault();
+    return false;
+  };
+
+  const preventRightClick = (e) => {
+    e.preventDefault();
+    return false;
+  };
+
+  // Add these to your existing useEffect that runs on mount
+  useEffect(() => {
+    // Disable text selection for the entire document
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+
+    // Add event listeners
+    document.addEventListener('copy', preventCopyPaste);
+    document.addEventListener('paste', preventCopyPaste);
+    document.addEventListener('contextmenu', preventRightClick);
+
+    // Cleanup function
+    return () => {
+      document.body.style.userSelect = 'auto';
+      document.body.style.webkitUserSelect = 'auto';
+      document.body.style.msUserSelect = 'auto';
+      document.body.style.mozUserSelect = 'auto';
+      
+      document.removeEventListener('copy', preventCopyPaste);
+      document.removeEventListener('paste', preventCopyPaste);
+      document.removeEventListener('contextmenu', preventRightClick);
+    };
+  }, []);
+
   const fetchQuestions = async (decryptedData) => {
     try {
       setIsLoading(true);
@@ -269,7 +306,11 @@ export const Quiz = () => {
           </div>
 
           {/* Question */}
-          <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="bg-gray-50 p-6 rounded-lg select-none"
+            onCopy={preventCopyPaste}
+            onPaste={preventCopyPaste}
+            onContextMenu={preventRightClick}
+          >
             <h3 className="text-xl font-medium text-gray-900 mb-6">
               {questions[currentQuestion].question}
             </h3>
@@ -282,7 +323,10 @@ export const Quiz = () => {
                   <button
                     key={index}
                     onClick={() => handleAnswer(index)}
-                    className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center gap-3
+                    onCopy={preventCopyPaste}
+                    onPaste={preventCopyPaste}
+                    onContextMenu={preventRightClick}
+                    className={`w-full p-4 rounded-lg border-2 transition-all duration-200 flex items-center gap-3 select-none
                       ${isSelected 
                         ? 'border-blue-500 bg-blue-50 text-blue-700' 
                         : 'border-gray-200 hover:border-blue-200 hover:bg-blue-50'}`}
