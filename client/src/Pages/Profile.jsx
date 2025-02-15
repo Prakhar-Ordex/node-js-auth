@@ -18,7 +18,7 @@ const Profile = () => {
             console.log(jsonData);
             setData(jsonData.user);
           }
-          if (response.status === 410) {
+          if (response.status >= 400) {
             navigate("/signin");
             localStorage.clear();
             toast.error("Session expired, please signin again");

@@ -79,21 +79,34 @@ const singIn = async (req, res) => {
     }
 };
 
+
 const getProfile = async (req, res) => {
     try {
         const refreshToken = req.cookies?.refresh_token;
-        if (!refreshToken) return res.status(410).json({ message: "You are not authenticated" });
+        if (!refreshToken) {
+            return res.status(401).json({ message: "You are not authenticated" });
+        }
+
         const decodedRefresh = jwt.verify(refreshToken, "privateKey");
         const user = await User.findByPk(decodedRefresh.id);
-        if (!user) return res.status(404).json({ message: "User not found" });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
         res.status(200).json({ user });
     } catch (error) {
-        if (error.name !== "TokenExpiredError") {
-            return res.status(410).json({ message: "Invalid access token" });
+        if (error.name === "TokenExpiredError") {
+            return res.status(401).json({ message: "Token expired. Please log in again." });
+        } else if (error.name === "JsonWebTokenError") {
+            return res.status(403).json({ message: "Invalid token" });
+        } else {
+            console.error("Unexpected error:", error);
+            return res.status(500).json({ message: "Internal server error" });
         }
-        console.log(error)
     }
-}
+};
+
 
 
 const logOut = async (_, res) => {

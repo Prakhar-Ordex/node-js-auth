@@ -221,7 +221,7 @@ export const Quiz = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 410) {
+        if (response.status >= 400) {
           toast.warn("Please SignIn or SignUp to generate your certificate");
           navigate('/signin?redirect=certificate');
           return;

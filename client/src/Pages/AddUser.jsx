@@ -65,7 +65,7 @@ const AddUser = () => {
       } else {
         toast.error(data.error)
       }
-      if (User.status === 410) {
+      if (User.status >= 400) {
         navigate("/signin");
         localStorage.clear();
         toast.error("Session expired, please signin again");
