@@ -40,7 +40,7 @@ const singIn = async (req, res) => {
         const access_token = jwt.sign(
             { id: jwtData.id, username: jwtData.username, email: jwtData.email },
             'privateKey',
-            { expiresIn: "10s" }
+            { expiresIn: "1h" }
         );
         const refresh_token = jwt.sign(
             { id: jwtData.id, username: jwtData.username, email: jwtData.email },
@@ -52,8 +52,8 @@ const singIn = async (req, res) => {
 
         await User.update(addToken, { where: { email } });
 
-        const accessTokenMaxAge = 10 * 1000;
-        const refreshTokenMaxAge = 30 * 60 *  1000;
+        const accessTokenMaxAge = 60 * 60 * 1000;
+        const refreshTokenMaxAge =24*  60 * 60 *  1000;
 
         res.status(200)
             .cookie('access_token', access_token, {

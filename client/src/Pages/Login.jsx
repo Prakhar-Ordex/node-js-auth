@@ -58,6 +58,7 @@ const Login = () => {
 
         if (queryData === 'questions') {
           navigate(-1);
+          // navigate("/skill-tests");
           return;
         }
 

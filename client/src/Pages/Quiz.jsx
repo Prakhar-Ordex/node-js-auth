@@ -135,7 +135,7 @@ export const Quiz = () => {
       const { questions, totalTime } = await response.json(); // Destructure questions and totalTime from response
 
       if (!response.ok) {
-        if (response.status === 410) {
+        if (response.status >= 400) {
           toast.error("You Don't have account please login first");
           navigate('/signin?redirect=questions');
           return;
