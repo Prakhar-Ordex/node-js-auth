@@ -13,6 +13,15 @@ const questions = async (req, res) => {
         attributes: ['id', 'question', 'options'],
         where: { type, title },
       });
+
+      // Shuffle the questions array using Fisher-Yates algorithm
+      for (let i = questions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [questions[i], questions[j]] = [questions[j], questions[i]];
+      }
+
+      // Optionally limit the number of questions if you want to select only a subset
+      // questions = questions.slice(0, desiredNumberOfQuestions);
     } else {
       questions = await Question.findAll({
         attributes: ['id', 'question', 'options'],
@@ -128,8 +137,42 @@ const submitQuestions = async (req, res) => {
   }
 }
 
+const addQuestions = async (req, res) => {
+  try {
+    const questionsData = req.body; // Array of questions
+    
+    // Validate input data
+    if (!Array.isArray(questionsData)) {
+      return res.status(400).json({ message: "Questions data must be an array" });
+    }
+
+    // Check if each question has required fields
+    for (const question of questionsData) {
+      if (!question.type || !question.title || !question.question || 
+          !Array.isArray(question.options) || question.correctAnswer === undefined) {
+        return res.status(400).json({ 
+          message: "Each question must have type, title, question, options array, and correctAnswer" 
+        });
+      }
+    }
+
+    // Add questions to database
+    const createdQuestions = await Question.bulkCreate(questionsData);
+
+    res.status(201).json({
+      message: `Successfully added ${createdQuestions.length} questions`,
+      questions: createdQuestions
+    });
+
+  } catch (error) {
+    console.error('Error adding questions:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
 module.exports = {
   questions,
   submitQuestions,
-  getAllquiz
+  getAllquiz,
+  addQuestions
 }

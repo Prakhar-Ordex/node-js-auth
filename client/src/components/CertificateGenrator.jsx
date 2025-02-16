@@ -1,5 +1,7 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
+import companyLogo from '../asset/hirez-logo.png'
+import signLogo from '../asset/sign.png'
 
 const CertificateCanvas = forwardRef(({
   recipientName = "Prakhar Tripathi",
@@ -35,6 +37,7 @@ const CertificateCanvas = forwardRef(({
   };
   const signatureLogo = () => {
     return new Promise((resolve, reject) => {
+      if (!signLogo) {
         resolve(null);
         return;
       }
@@ -45,6 +48,7 @@ const CertificateCanvas = forwardRef(({
         resolve(img);
       };
       img.onerror = reject;
+      img.src = signLogo;
     });
   };
 
