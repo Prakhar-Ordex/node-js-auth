@@ -1,6 +1,5 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
-import companyLogo from '../asset/logo.png'
 
 const CertificateCanvas = forwardRef(({
   recipientName = "Prakhar Tripathi",
@@ -36,7 +35,6 @@ const CertificateCanvas = forwardRef(({
   };
   const signatureLogo = () => {
     return new Promise((resolve, reject) => {
-      if (!companyLogo) {
         resolve(null);
         return;
       }
@@ -47,7 +45,6 @@ const CertificateCanvas = forwardRef(({
         resolve(img);
       };
       img.onerror = reject;
-      img.src = companyLogo;
     });
   };
 
@@ -104,7 +101,7 @@ const CertificateCanvas = forwardRef(({
 
     // Draw company logo if provided
     if (logoRef.current) {
-      const logoSize = 150;
+      const logoSize = 300;
       const aspectRatio = logoRef.current.width / logoRef.current.height;
       const logoWidth = aspectRatio >= 1 ? logoSize : logoSize * aspectRatio;
       const logoHeight = aspectRatio >= 1 ? logoSize / aspectRatio : logoSize;
@@ -166,12 +163,19 @@ const CertificateCanvas = forwardRef(({
 
       // Draw signature image and details
       if (signatureRef.current) {
-        const signatureWidth = 150;
-        const signatureHeight = 60;
+        // Increased signature dimensions
+        const signatureWidth = 250; // Increased from 150
+        const signatureHeight = 200; // Increased from 60
+        
+        // Adjusted positioning for better placement
+        const signatureX = width - 300; // Moved slightly to the left
+        const signatureY = 490; // Moved slightly up
+        
+        // Draw signature with new dimensions
         ctx.drawImage(
           signatureRef.current,
-          width - 250,
-          540,
+          signatureX,
+          signatureY,
           signatureWidth,
           signatureHeight
         );
@@ -179,7 +183,7 @@ const CertificateCanvas = forwardRef(({
     // Draw signature section
     ctx.textAlign = 'right';
     ctx.font = 'italic 20px cursive';
-    ctx.fillText(signerName, width - 100, 600);
+    // ctx.fillText(signerName, width - 100, 600);
     ctx.font = '15px Arial';
     ctx.fillText(signerTitle, width - 100, 630);
   };
@@ -231,7 +235,7 @@ const CertificateCanvas = forwardRef(({
     };
 
     initCanvas();
-  }, [width, height, recipientName, certificationName, earnedDate, certificateId, signerName, signerTitle, companyLogo]);
+  }, [width, height, recipientName, certificationName, earnedDate, certificateId, signerName, signerTitle, companyLogo,signLogo]);
 
   // Expose the download function via ref
   useEffect(() => {
