@@ -3,6 +3,7 @@ import Input from '../components/common/Input'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import { API } from '../constant/api';
+import { encryptData } from '../utils/encryptData';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,7 +44,8 @@ const Login = () => {
 
       if (loginUser.ok) {
         if (loginUser.status === 200) {
-          localStorage.setItem('loginUser', JSON.stringify(data.data));
+          const encryptDatas =  encryptData(data.data);
+          localStorage.setItem('auth', encryptDatas);
           toast.success("Logged in successfully")
         }
 

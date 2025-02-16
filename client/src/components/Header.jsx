@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { isLogin } from '../utils/auth';
+import { isLogin, clearAuth } from '../utils/auth';
 import { API } from '../constant/api';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -21,12 +22,12 @@ const Header = () => {
       });
       
       if (response.status === 202) {
-        localStorage.clear();
-        sessionStorage.clear();
+        clearAuth();
         navigate('/');
       }
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Logout error:", error);
+      toast.error("Failed to logout. Please try again.");
     }
   };
 

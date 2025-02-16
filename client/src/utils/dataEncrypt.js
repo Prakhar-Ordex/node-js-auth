@@ -15,7 +15,7 @@ export const decryptQueryParams = (encryptedText) => {
         // Validate timestamp (24 hours)
         const timestamp = new Date(decryptedData.timestamp);
         const now = new Date();
-        const validityPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        const validityPeriod = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
         if (now - timestamp > validityPeriod) {
             console.warn('Decryption failed: Link expired');
