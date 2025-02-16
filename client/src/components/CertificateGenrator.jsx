@@ -7,7 +7,7 @@ const CertificateCanvas = forwardRef(({
   earnedDate = "20 Jan, 2025",
   certificateId = "A4618D17D1FF",
   signerName = "Harishankaran K",
-  signerTitle = "CTO, HackerRank",
+  signerTitle = "CTO, HireZ",
   width = 1000,
   height = 700,
   // companyLogo = null ,// New prop for company logo
@@ -116,7 +116,7 @@ const CertificateCanvas = forwardRef(({
     }
 
     // Draw main title
-    ctx.font = 'bold 44px serif';
+    ctx.font = 'bold 44px "Times New Roman", serif';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.fillText('Certificate of Accomplishment', width/2, 200);
@@ -124,7 +124,10 @@ const CertificateCanvas = forwardRef(({
     // Draw certification name banner
     ctx.save();
     ctx.translate(width/2, 270);
-    ctx.fillStyle = '#1a1a1a';
+    const gradient = ctx.createLinearGradient(-230, 0, 230, 0);
+    gradient.addColorStop(0, '#2563eb');
+    gradient.addColorStop(1, '#1d4ed8');
+    ctx.fillStyle = gradient; 
     
     // Banner shape
     ctx.beginPath();
@@ -136,7 +139,7 @@ const CertificateCanvas = forwardRef(({
     ctx.fill();
     
     ctx.fillStyle = 'white';
-    ctx.font = '24px Arial';
+    ctx.font = 'bold 28px Arial';
     ctx.fillText(certificationName, 0, 8);
     ctx.restore();
 
@@ -146,19 +149,30 @@ const CertificateCanvas = forwardRef(({
     ctx.fillText('PRESENTED TO', width/2, 350);
 
     // Draw recipient name
-    ctx.font = 'italic 36px serif';
+    ctx.font = 'bold italic 36px serif';
     ctx.fillStyle = 'black';
     ctx.fillText(recipientName, width/2, 400);
 
+     // Add decorative line below name
+     ctx.strokeStyle = '#2563eb';
+     ctx.beginPath();
+     ctx.moveTo(width/2 - 200, 410);
+     ctx.lineTo(width/2 + 200, 410);
+     ctx.stroke();
+     ctx.restore();
+
     // Draw description
-    ctx.font = '16px Arial';
+    ctx.font = '18px Arial';
     ctx.fillStyle = '#666666';
     ctx.fillText('The bearer of this certificate has passed the skill certification test', 
       width/2, 450);
 
     // Draw bottom information
     ctx.textAlign = 'left';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#1a1a1a';
     ctx.fillText(`Earned on: ${earnedDate}`, 100, 600);
+    ctx.font = '16px Arial';
     ctx.fillText(`ID: ${certificateId}`, 100, 630);
 
       // Draw signature image and details
@@ -184,8 +198,8 @@ const CertificateCanvas = forwardRef(({
     ctx.textAlign = 'right';
     ctx.font = 'italic 20px cursive';
     // ctx.fillText(signerName, width - 100, 600);
-    ctx.font = '15px Arial';
-    ctx.fillText(signerTitle, width - 100, 630);
+    ctx.font = '17px Arial';
+    ctx.fillText(signerTitle, width - 130, 630);
   };
 
   const downloadCertificate = async (format = 'png') => {
