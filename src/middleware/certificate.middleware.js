@@ -6,7 +6,8 @@ const validateCertificateAccess = async (req, res, next) => {
     const token = req.cookies?.refresh_token; // Extract token from headers
     let isAuth;
     if (!token) {
-        isAuth = false;
+        req.isAuth = false;
+        return next();
     }
 
     try {
@@ -21,9 +22,12 @@ const validateCertificateAccess = async (req, res, next) => {
         }
 
         req.isAuth = isAuth; // Attach user to request
-        next(); // Proceed to the next middleware or route handler
+        return next(); // Proceed to the next middleware or route handler
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+        req.isAuth = false;
+        return next();
+        // console.log(error)
+        // res.status(500).json({ message: 'Internal server error' });
     }
 };
 
