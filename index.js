@@ -15,7 +15,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use(cors({
-  origin: "https://quizmasterss.netlify.app/",
+  origin: "https://quizmasterss.netlify.app",
   credentials: true
 }))   
 
