@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import ShowResult from "./QuestionResultCard";
 
 export const Result = () => {
   const navigate = useNavigate();
@@ -12,15 +13,16 @@ export const Result = () => {
   const [questions, setQuestions] = useState([]);
   const [certificateId, setCertificateID] = useState(null);
   const [passingScore, setPassingScore] = useState(null);
+  const result = JSON.parse(sessionStorage.getItem('pendingQuizResult'))
 
   const getResult = async () => {
-    const result = JSON.parse(sessionStorage.getItem('pendingQuizResult'));
 
     if (!result) {
       toast.error("No quiz result found");
       navigate('/skill-tests');
       return;
     }
+
     setPass(result.passingStatus);
     setScore(result.score);
     setQuestions(result.totalQuestions);
@@ -40,82 +42,9 @@ export const Result = () => {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-xl p-8 text-center transform transition-all duration-300 hover:scale-102">
-        {!isPass ? (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="text-red-500 mb-4 animate-bounce">
-              <svg className="w-24 h-24 mx-auto transform transition-transform duration-300 hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Sorry, You Didn't Pass
-            </h2>
-            <p className="text-gray-600 mb-8 text-lg">
-              You need to answer at least <span className="font-semibold text-red-500">{passingScore}</span> questions correctly to pass the quiz.
-            </p>
-            <p className="text-xl font-semibold text-gray-800 mb-8">
-              Your Score: <span className="text-red-500 text-2xl">{score}/{questions}</span>
-            </p>
-            <div className="space-x-4">
-              <a
-                href="/skill-tests"
-                className="inline-block bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transform transition-transform duration-200 hover:-translate-y-1 shadow-md hover:shadow-lg"
-              >
-                Try Again
-              </a>
-              <a
-                href="/"
-                className="inline-block bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600 transform transition-transform duration-200 hover:-translate-y-1 shadow-md hover:shadow-lg"
-              >
-                Home
-              </a>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6 animate-fadeIn">
-            <div className="flex items-center justify-center mb-6 transform transition-transform duration-300 hover:scale-110">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" height="200">
-                <path d="M35 25 L65 25 L60 80 L40 80 Z" fill="#FFD700" stroke="#DAA520" strokeWidth="1.5" />
-                <path d="M32 25 L68 25 L65 30 L35 30 Z" fill="#FFD700" stroke="#DAA520" strokeWidth="1.5" />
-                <path d="M35 35 C15 35, 15 55, 35 55" fill="none" stroke="#FFD700" strokeWidth="4" />
-                <path d="M65 35 C85 35, 85 55, 65 55" fill="none" stroke="#FFD700" strokeWidth="4" />
-                <rect x="45" y="80" width="10" height="15" fill="#DAA520" />
-                <rect x="35" y="95" width="30" height="5" fill="#DAA520" />
-                <path d="M40 35 L60 35 L57 70 L43 70 Z" fill="#FFF" opacity="0.1" />
-                <circle cx="50" cy="50" r="8" fill="#DAA520" />
-                <text x="50" y="53" textAnchor="middle" fill="#FFD700" fontSize="8" fontWeight="bold">#1</text>
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-green-600 mb-4">
-              Congratulations! You Passed!
-            </h2>
-            <p className="text-gray-600 mb-8 text-lg">
-              Great job on completing the quiz successfully!
-            </p>
-            <p className="text-xl font-semibold text-gray-800 mb-8">
-              Your Score: <span className="text-green-500 text-2xl">{score}/{questions}</span>
-            </p>
-            <div className="space-x-4">
-              <Link
-                to={`/certificate/${certificateId}`}
-                className="inline-block bg-green-500 text-white px-8 py-3 rounded-lg hover:bg-green-600 transform transition-transform duration-200 hover:-translate-y-1 shadow-md hover:shadow-lg"
-              >
-                Generate Certificate
-              </Link>
-              <a
-                href="/"
-                className="inline-block bg-gray-500 text-white px-8 py-3 rounded-lg hover:bg-gray-600 transform transition-transform duration-200 hover:-translate-y-1 shadow-md hover:shadow-lg"
-              >
-                Home
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    <ShowResult result={result} questions={result.questions} />
+  )
+
 };
 
 export default Result;

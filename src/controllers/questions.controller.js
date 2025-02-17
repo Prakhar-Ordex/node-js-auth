@@ -55,17 +55,22 @@ const submitQuestions = async (req, res) => {
   try {
     const { title, answers,type } = req.body;
     const id = req.id;
-    const refreshToken = req.cookies?.refresh_token;
-    console.log("refresh>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", refreshToken)
 
-    const questions = await Question.findAll({ attributes: ['id', 'correctAnswer'], where: { type, title }, });
+    const questions = await Question.findAll({ attributes: ['id', 'question','options', 'correctAnswer'], where: { type, title }, });
     // console.log("first>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",questions)
     let score = 0;
+    const questionResults = {};
 
     questions.forEach((question) => {
-      if (answers[question.id] === question.correctAnswer) {
+      const isCorrect = answers[question.id] === question.correctAnswer;
+      if (isCorrect) {
         score++;
       }
+      questionResults[question.id] = {
+        isCorrect,
+        userAnswer: answers[question.id],
+        correctAnswer: question.correctAnswer
+      };
     });
 
     const passingScore = Math.ceil(questions.length * 0.85);
@@ -76,7 +81,8 @@ const submitQuestions = async (req, res) => {
       score: score,
       passingStatus: passed,
       quizName: title,
-      totalQuestions: questions.length
+      totalQuestions: questions.length,
+      answers: answers 
     });
 
     await result.save();
@@ -117,7 +123,10 @@ const submitQuestions = async (req, res) => {
           passingStatus: resultData.passingStatus,
           score: resultData.score,
           certificateID: certificateData.id,
-          totalQuestions: resultData.totalQuestions
+          totalQuestions: resultData.totalQuestions,
+          answers,
+          questions,
+          questionResults
         });
       } catch (error) {
         res.status(500).json({ error: error.message });
@@ -128,7 +137,10 @@ const submitQuestions = async (req, res) => {
           passingStatus: resultData.passingStatus,
           score: resultData.score,
           totalQuestions: resultData.totalQuestions,
-          passingScore: passingScore
+          passingScore: passingScore,
+          answers,
+          questions,
+          questionResults
         });
     }
 

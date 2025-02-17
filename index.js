@@ -6,6 +6,7 @@ const questionRouter = require("./src/routes/questions.routes");
 const certificateRouter = require("./src/routes/certificate.routes");
 const cors = require('cors');
 var cookieParser = require('cookie-parser');
+const { CORSLOCAL, CORS } = require('./src/constant/Api');
 const app = express()
 const port = 3000
 
@@ -15,7 +16,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use(cors({
-  origin: "https://quizmasterss.netlify.app",
+  origin: CORS,
   credentials: true
 }))   
 
